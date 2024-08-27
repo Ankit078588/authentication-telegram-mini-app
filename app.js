@@ -32,7 +32,7 @@ app.post('/authenticate', async (req, res) => {
     }
 
     try {
-        const BOT_TOKEN = 'AAGdO4ujR4R0p6Gn9cDFRrgeXYaKl-xG_dQ';
+        const BOT_TOKEN = '7266000337:AAFxRzIlq8Q4I-3I2lAG-_PoffQehH-o0EM';
         const secret = crypto.createHash('sha256').update(BOT_TOKEN).digest();
         const dataCheckString = `auth_date=${authDate}\nid=${telegramUserId}`;
         const computedHash = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
