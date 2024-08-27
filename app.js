@@ -16,37 +16,34 @@ app.use(express.urlencoded({ extended: true }));
 
 
 
-// create referral link
-app.post('/generate-referral', async (req, res) => {
-    const { telegramId, name } = req.body;
+// Create dummy data to test using POSTMAN
+app.post('/createdata', async (req, res) => {
+    const { telegramUserId, name } = req.body;
 
-    if (!telegramId || !name) {
+    if (!telegramUserId || !name) {
         return res.status(400).json({ error: 'Telegram ID and name are required' });
     }
 
     try {
-        let user = await User.findOne({ telegramId });
-        if (!user) {
-            user = new User({ telegramId, name });
-            await User.save();
-        }
+        // Create and save a new user
+        const newUser = new User({ telegramId: telegramUserId, name });
+        await newUser.save();
 
-        // Generate referral link
-        const referralId = `r_${telegramId}`;
-        const referralLink = `https://t.me/BOT_USERNAME?startapp=${referralId}`;
-        // Update user's referral link
-        user.referralId = referralId;
-        user.referralLink = referralLink;
-        await userModel.save();
+        // Generate the hash
+        const BOT_TOKEN = 'AAGdO4ujR4R0p6Gn9cDFRrgeXYaKl-xG_dQ'; 
+        const secret = crypto.createHash('sha256').update(BOT_TOKEN).digest();                              // Hash BOT token to generate SECRET
+        const dataCheckString = `name=${name}\nid=${telegramUserId}`;                                       // Create data string - name + telegramUserId
+        const hash = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');             // Generate HMAC hash
 
-        res.json({ referralLink });
+        res.json({ telegramUserId, name, hash });
     } catch (error) {
-        console.error('Error creating referral link:', error);
+        console.error('Error creating data:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Authentication
+
+// Authentication 
 app.post('/authenticate', async (req, res) => {
     const { telegramUserId, name, hash } = req.body;
 
@@ -88,36 +85,36 @@ app.post('/authenticate', async (req, res) => {
 
 
 
-// Create dummy data
-app.post('/createdata', async (req, res) => {
-    const { telegramUserId, name } = req.body;
 
-    if (!telegramUserId || !name) {
+// create referral link
+app.post('/generate-referral', async (req, res) => {
+    const { telegramId, name } = req.body;
+
+    if (!telegramId || !name) {
         return res.status(400).json({ error: 'Telegram ID and name are required' });
     }
 
     try {
-        // Create and save a new user
-        const newUser = new User({ telegramId: telegramUserId, name });
-        await newUser.save();
+        let user = await User.findOne({ telegramId });
+        if (!user) {
+            user = new User({ telegramId, name });
+            await User.save();
+        }
 
-        // Generate the hash
-        const BOT_TOKEN = 'AAGdO4ujR4R0p6Gn9cDFRrgeXYaKl-xG_dQ'; 
-        const secret = crypto.createHash('sha256').update(BOT_TOKEN).digest();                              // Hash BOT token to generate SECRET
-        const dataCheckString = `name=${name}\nid=${telegramUserId}`;                                       // Create data string - name + telegramUserId
-        const hash = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');             // Generate HMAC hash
+        // Generate referral link
+        const referralId = `r_${telegramId}`;
+        const referralLink = `https://t.me/BOT_USERNAME?startapp=${referralId}`;
+        // Update user's referral link
+        user.referralId = referralId;
+        user.referralLink = referralLink;
+        await userModel.save();
 
-        res.json({ telegramUserId, name, hash });
+        res.json({ referralLink });
     } catch (error) {
-        console.error('Error creating data:', error);
+        console.error('Error creating referral link:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-
-app.get('/', (req, res)=>{
-    res.send('Welcome to Telegram!');
-})
 
 
 app.listen(PORT, () => {
