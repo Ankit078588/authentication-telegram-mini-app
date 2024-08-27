@@ -39,8 +39,7 @@ app.post('/authenticate', async (req, res) => {
     try{
         const BOT_TOKEN = '7266000337:AAFxRzIlq8Q4I-3I2lAG-_PoffQehH-o0EM';
         const secret = crypto.createHash('sha256').update(BOT_TOKEN).digest().toString('hex');
-        // const dataCheckString = `auth_date=${authDate}\nid=${telegramUserId}`;
-        const dataCheckString = `auth_date=${authDate}\nid=${telegramUserId}\nname=${name}`;
+        const dataCheckString = `auth_date=${authDate}\nid=${telegramUserId}`;
         const computedHash = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
         console.log('5: ' + BOT_TOKEN);
         console.log('6: ' + secret);
@@ -55,7 +54,7 @@ app.post('/authenticate', async (req, res) => {
         let user = await User.findOne({ telegramId: telegramUserId });
         if (!user) {
             user = new User({ telegramId: telegramUserId, name });
-            await User.save();
+            await user.save();
         }
 
         res.json({ status: 'authenticated', user });
@@ -78,14 +77,14 @@ app.post('/generate-referral', async (req, res) => {
         let user = await User.findOne({ telegramId });
         if (!user) {
             user = new User({ telegramId, name });
-            await User.save();
+            await user.save();
         }
 
         const referralId = `r_${telegramId}`;
         const referralLink = `https://t.me/BOT_USERNAME?startapp=${referralId}`;
         user.referralId = referralId;
         user.referralLink = referralLink;
-        await User.save();
+        await user.save();
 
         res.json({ referralLink });
     } catch (error) {
