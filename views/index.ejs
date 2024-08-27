@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Mini App</title>
+    <style>
+        body {
+            display: none; /* Hide entire body initially */
+        }
+    </style>
+    <script type="module">
+        import { initDataUnsafe } from '@twa-dev/sdk';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const telegram = window.Telegram.WebApp;
+            telegram.ready();
+
+            const initDataUnsafe = telegram.initDataUnsafe;
+            const { user, auth_date, hash } = initDataUnsafe;
+
+            // Send this data to your backend for verification
+            fetch('/authenticate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    telegramUserId: user.id,
+                    name: user.first_name,
+                    hash: hash,
+                    authDate: auth_date
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messageElement = document.getElementById('message');
+                const welcomeMessageElement = document.getElementById('welcome-message');
+
+                if (data.status === 'authenticated') {
+                    welcomeMessageElement.textContent = 'Welcome, ' + user.first_name + '!';
+                    messageElement.textContent = 'Authentication successful.';
+                    document.body.style.display = 'block'; // Show body content
+                } else {
+                    messageElement.textContent = 'Authentication failed.';
+                    document.body.style.display = 'none'; // Hide body content
+                }
+            })
+            .catch(error => {
+                console.error('Authentication error:', error);
+                document.body.style.display = 'none'; // Hide body content on error
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1 id="welcome-message"></h1>
+    <p id="message"></p>
+</body>
+</html>
