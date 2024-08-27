@@ -67,14 +67,14 @@ app.post('/generate-referral', async (req, res) => {
         let user = await User.findOne({ telegramId });
         if (!user) {
             user = new User({ telegramId, name });
-            await user.save();
+            await User.save();
         }
 
         const referralId = `r_${telegramId}`;
         const referralLink = `https://t.me/BOT_USERNAME?startapp=${referralId}`;
         user.referralId = referralId;
         user.referralLink = referralLink;
-        await user.save();
+        await User.save();
 
         res.json({ referralLink });
     } catch (error) {
