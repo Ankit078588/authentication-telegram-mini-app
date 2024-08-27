@@ -26,16 +26,27 @@ app.get('/', (req, res) => {
 // Authentication
 app.post('/authenticate', async (req, res) => {
     const { telegramUserId, name, hash, authDate } = req.body;
+    console.log('1: ' + telegramUserId);
+    console.log('2: ' + name);
+    console.log('3: ' + hash);
+    console.log('4: ' + authDate);
+    
 
     if (!telegramUserId || !name || !hash || !authDate) {
         return res.status(400).json({ error: 'Authentication data missing' });
     }
 
-    try {
+    try{
         const BOT_TOKEN = '7266000337:AAFxRzIlq8Q4I-3I2lAG-_PoffQehH-o0EM';
         const secret = crypto.createHash('sha256').update(BOT_TOKEN).digest();
         const dataCheckString = `auth_date=${authDate}\nid=${telegramUserId}`;
         const computedHash = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
+        console.log('5: ' + BOT_TOKEN);
+        console.log('6: ' + secret);
+        console.log('7: ' + dataCheckString);
+        console.log('8' + computedHash);   
+        
+
 
         if (computedHash !== hash) {
             return res.status(403).json({ error: 'Authentication failed' });
