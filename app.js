@@ -37,16 +37,16 @@ app.post('/authenticate', async (req, res) => {
     }
 
     try{
-        const BOT_TOKEN = '7266000337:AAFxRzIlq8Q4I-3I2lAG-_PoffQehH-o0EM';
+        const BOT_TOKEN = 'AAFxRzIlq8Q4I-3I2lAG-_PoffQehH-o0EM';
         const secret = crypto.createHash('sha256').update(BOT_TOKEN).digest();
-        
+
         // const dataCheckString = `auth_date=${authDate}\nid=${telegramUserId}`;
         const dataCheckString = `auth_date=${authDate}\nid=${telegramUserId}\nname=${name}`;
         const computedHash = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
         console.log('5: ' + BOT_TOKEN);
         console.log('6: ' + secret);
         console.log('7: ' + dataCheckString);
-        console.log('8' + computedHash);   
+        console.log('8: ' + computedHash);   
 
         if (computedHash !== hash) {
             console.log('hash not matched');
