@@ -9,17 +9,18 @@
             display: none; /* Hide entire body initially */
         }
     </style>
-    <script type="module">
-        import { initDataUnsafe } from '@twa-dev/sdk';
-
+    <script>
         window.addEventListener('DOMContentLoaded', () => {
+            console.log('Exec js -1');
+            
             const telegram = window.Telegram.WebApp;
             telegram.ready();
 
-            const initDataUnsafe = telegram.initDataUnsafe;
-            const { user, auth_date, hash } = initDataUnsafe;
+            console.log('Exec js -2');
+            const { user, auth_date, hash } = telegram.initDataUnsafe;
 
             // Send this data to your backend for verification
+            console.log('Exec js -3');
             fetch('/authenticate', {
                 method: 'POST',
                 headers: {
@@ -38,7 +39,7 @@
                 const welcomeMessageElement = document.getElementById('welcome-message');
 
                 if (data.status === 'authenticated') {
-                    welcomeMessageElement.textContent = 'Welcome, ' + user.first_name + '!';
+                    welcomeMessageElement.textContent = `Welcome, ${user.first_name}!`;
                     messageElement.textContent = 'Authentication successful.';
                     document.body.style.display = 'block'; // Show body content
                 } else {
@@ -48,6 +49,8 @@
             })
             .catch(error => {
                 console.error('Authentication error:', error);
+                const messageElement = document.getElementById('message');
+                messageElement.textContent = 'An error occurred during authentication. Please try again later.';
                 document.body.style.display = 'none'; // Hide body content on error
             });
         });
