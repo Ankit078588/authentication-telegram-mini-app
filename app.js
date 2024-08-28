@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.get('/', (req, res) => {
-    res.render('index', { user: req.user || {} }); 
+    res.render('index', { user: req.user || {} });
 });
 
 
@@ -30,13 +30,13 @@ app.post('/authenticate', async (req, res) => {
     console.log('2: ' + name);
     console.log('3: ' + hash);
     console.log('4: ' + authDate);
-    
+
 
     if (!telegramUserId || !name || !hash || !authDate) {
         return res.status(400).json({ error: 'Authentication data missing' });
     }
 
-    try{
+    try {
         const BOT_TOKEN = '7266000337:AAFxRzIlq8Q4I-3I2lAG-_PoffQehH-o0EM';
         const secret = crypto.createHash('sha256').update(BOT_TOKEN).digest().toString('hex');
         const dataCheckString = `auth_date=${authDate}\nid=${telegramUserId}`;
@@ -44,7 +44,7 @@ app.post('/authenticate', async (req, res) => {
         console.log('5: ' + BOT_TOKEN);
         console.log('6: ' + secret);
         console.log('7: ' + dataCheckString);
-        console.log('8: ' + computedHash);   
+        console.log('8: ' + computedHash);
 
         if (computedHash !== hash) {
             console.log('hash not matched');
@@ -54,6 +54,8 @@ app.post('/authenticate', async (req, res) => {
         let user = await User.findOne({ telegramId: telegramUserId });
         if (!user) {
             user = new User({ telegramId: telegramUserId, name });
+            user.referralId = `r_${telegramId}`;
+            user.referralLink = `https://t.me/ankit78588_bot?startapp=${referralId}`;
             await user.save();
         }
 
@@ -92,6 +94,9 @@ app.post('/generate-referral', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
