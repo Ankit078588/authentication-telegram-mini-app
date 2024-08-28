@@ -1,4 +1,0 @@
-t.me/ankit78588_bot
-
-
-<script src="https://telegram.org/js/telegram-web-app.js" strategy="beforInteractive"></script>
